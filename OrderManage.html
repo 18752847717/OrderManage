@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <title>订单管理</title>
+</head>
+
+<body>
+    <div id="app">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">订单管理</h3>
+            </div>
+            <div class="panel-body">
+                <label for="brand" class="col-sm-3">
+                    品牌:<input type="text" id="name" v-model="nameParam">
+                </label>
+                <button type="button" class="btn btn-primary" @click="query">查询</button>
+                <button type="button" class="btn btn-primary" @click="addOrder">添加</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>品牌</th>
+                        <th>日期</th>
+                        <th>价格</th>
+                        <th>数量</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in orders" :key="item.id">
+                        <td>{{item.name}}</td>
+                        <td>{{item.date | yyyyMMdd}}</td>
+                        <td>{{item.price}}</td>
+                        <td>
+                            <input type="button" value="-">
+                            <span v-once>{{item.num}}</span>
+                            <input type="button" value="+">
+                        </td>
+                        <td>
+                            <button @click="deleteOrder(index)">删除</button>
+                        </td>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="modal-dialog">
+            <legend>添加订单</legend>
+            <div class="form-group">
+                <label>品牌</label>
+                <input type="text" v-model="name" class="form-control" placeholder="例如:LG,三星,小米">
+            </div>
+
+            <div class="form-group">
+                <label>价格</label>
+                <input type="text" v-model.number="price" class="form-control" placeholder="1-999999元">
+            </div>
+            <div class="form-group">
+                <label>数量</label>
+                <input type="text" v-model.number="num" class="form-control" placeholder="如:1">
+            </div>
+            <button type="submit" @click="addOrder" class=" btn btn-primary">提交</button>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+
+        Vue.filter("yyyyMMdd", function (date) {
+            let dt = new Date(date);
+            let y = dt.getFullYear();
+            let m = (dt.getMonth() + 1).toString().padstart(2, '0');
+            let d = dt.getDate().toString().padstart(2, '0');
+            return `${y} -${m} -${d} `;
+        })
+
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                id: 0, // id
+                name: '', // 品牌
+                date: '', // 日期
+                price: 20, // 价格
+                num: 1, // 数量
+                orders: [], // 订单集合
+                nameParam: '', // 查询参数:品牌
+            },
+            methods: {
+                addOrder() {
+                    this.orders.push({
+                        id: this.id++,
+                        name: this.name,
+                        date: this.date,
+                        price: this.price,
+                        num: this.num
+                    })
+                    this.name = ''
+                    this.date = ''
+                    this.price = 20
+                    this.num = 1
+                },
+                deleteOrder(index) {
+                    this.orders.splice(index, 1)
+                },
+                query() {
+                    let _this = this
+                    this.orders = this.orders.filter(function (item) {
+                        return item.name.includes(_this.nameParam)
+                    })
+                },
+
+            },
+
+        })
+    </script>
+</body>
+
+</html>
